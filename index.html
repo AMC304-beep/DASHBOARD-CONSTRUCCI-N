@@ -533,11 +533,10 @@
                 boardMetadata = {
                     name: "Control de Ausencias & Cronograma",
                     columns: [
-                        { id: "status", title: "Estado", type: "status" },
-                        { id: "person", title: "Colaborador", type: "people" },
-                        { id: "type", title: "Tipo de Ausencia", type: "status" },
-                        { id: "timeline", title: "Cronograma", type: "timeline" },
-                        { id: "notes", title: "Observaciones", type: "text" }
+                        { id: "adcar", title: "Adcar", type: "text" },
+                        { id: "motivo_gerencia", title: "Motivo Gerencia", type: "status", settings_str: JSON.stringify({ labels: { 1: "Vacaciones", 2: "Permiso Personal", 3: "Incapacidad Médica", 4: "Capacitación / Formación" } }) },
+                        { id: "cronograma", title: "Cronograma", type: "timeline" },
+                        { id: "estado_aprobacion", title: "Estado de Aprobación", type: "status", settings_str: JSON.stringify({ labels: { 1: "Aprobado", 2: "Pendiente", 3: "Rechazado" } }) }
                     ],
                     groups: [{ id: "group_1", title: "Solicitudes 2025" }]
                 };
@@ -547,11 +546,10 @@
                         name: "Angela Cartagena - Vacaciones",
                         group: { id: "group_1", title: "Solicitudes 2025" },
                         column_values: [
-                            { id: "status", text: "Aprobado", label: "Aprobado", type: "status" },
-                            { id: "person", text: "Angela Cartagena", type: "people" },
-                            { id: "type", text: "Vacaciones", label: "Vacaciones", type: "status" },
-                            { id: "timeline", text: "2025-04-14 - 2025-04-20", from: "2025-04-14", to: "2025-04-20", type: "timeline" },
-                            { id: "notes", text: "Semana Santa y descanso anual", type: "text" }
+                            { id: "adcar", text: "AD-001 - Angela Cartagena", type: "text" },
+                            { id: "motivo_gerencia", text: "Vacaciones", label: "Vacaciones", type: "status" },
+                            { id: "cronograma", text: "2025-04-14 - 2025-04-20", from: "2025-04-14", to: "2025-04-20", type: "timeline" },
+                            { id: "estado_aprobacion", text: "Aprobado", label: "Aprobado", type: "status" }
                         ]
                     },
                     {
@@ -559,11 +557,10 @@
                         name: "Carlos Mario Restrepo - Permiso",
                         group: { id: "group_1", title: "Solicitudes 2025" },
                         column_values: [
-                            { id: "status", text: "Aprobado", label: "Aprobado", type: "status" },
-                            { id: "person", text: "Carlos Mario Restrepo", type: "people" },
-                            { id: "type", text: "Permiso Personal", label: "Permiso Personal", type: "status" },
-                            { id: "timeline", text: "2025-04-02 - 2025-04-03", from: "2025-04-02", to: "2025-04-03", type: "timeline" },
-                            { id: "notes", text: "Trámites notariales personales", type: "text" }
+                            { id: "adcar", text: "AD-002 - Carlos Restrepo", type: "text" },
+                            { id: "motivo_gerencia", text: "Permiso Personal", label: "Permiso Personal", type: "status" },
+                            { id: "cronograma", text: "2025-04-02 - 2025-04-03", from: "2025-04-02", to: "2025-04-03", type: "timeline" },
+                            { id: "estado_aprobacion", text: "Aprobado", label: "Aprobado", type: "status" }
                         ]
                     },
                     {
@@ -571,11 +568,10 @@
                         name: "Mariana Gómez - Incapacidad",
                         group: { id: "group_1", title: "Solicitudes 2025" },
                         column_values: [
-                            { id: "status", text: "Aprobado", label: "Aprobado", type: "status" },
-                            { id: "person", text: "Mariana Gómez", type: "people" },
-                            { id: "type", text: "Incapacidad Médica", label: "Incapacidad Médica", type: "status" },
-                            { id: "timeline", text: "2025-03-25 - 2025-03-28", from: "2025-03-25", to: "2025-03-28", type: "timeline" },
-                            { id: "notes", text: "Reposo médico por cirugía menor", type: "text" }
+                            { id: "adcar", text: "AD-003 - Mariana Gómez", type: "text" },
+                            { id: "motivo_gerencia", text: "Incapacidad Médica", label: "Incapacidad Médica", type: "status" },
+                            { id: "cronograma", text: "2025-03-25 - 2025-03-28", from: "2025-03-25", to: "2025-03-28", type: "timeline" },
+                            { id: "estado_aprobacion", text: "Aprobado", label: "Aprobado", type: "status" }
                         ]
                     },
                     {
@@ -583,11 +579,10 @@
                         name: "Felipe Morales - Capacitación",
                         group: { id: "group_1", title: "Solicitudes 2025" },
                         column_values: [
-                            { id: "status", text: "Pendiente", label: "Pendiente", type: "status" },
-                            { id: "person", text: "Felipe Morales", type: "people" },
-                            { id: "type", text: "Capacitación / Formación", label: "Capacitación / Formación", type: "status" },
-                            { id: "timeline", text: "2025-04-10 - 2025-04-11", from: "2025-04-10", to: "2025-04-11", type: "timeline" },
-                            { id: "notes", text: "Certificación Cloud", type: "text" }
+                            { id: "adcar", text: "AD-004 - Felipe Morales", type: "text" },
+                            { id: "motivo_gerencia", text: "Capacitación / Formación", label: "Capacitación / Formación", type: "status" },
+                            { id: "cronograma", text: "2025-04-10 - 2025-04-11", from: "2025-04-10", to: "2025-04-11", type: "timeline" },
+                            { id: "estado_aprobacion", text: "Pendiente", label: "Pendiente", type: "status" }
                         ]
                     }
                 ];
@@ -1009,14 +1004,17 @@
 
             closeEditModal();
             renderDynamicUI();
-            showToast("Actualizando en Monday...");
+            showToast("Actualizando de inmediato en Monday...");
+
+            const payloadStr = JSON.stringify(JSON.stringify(colValuesPayload));
+            const safeItemName = itemName.replace(/"/g, '\\"');
 
             const query = `
                 mutation {
                     change_multiple_column_values (
                         item_id: ${itemId},
                         board_id: ${BOARD_ID},
-                        column_values: ${JSON.stringify(JSON.stringify(colValuesPayload))}
+                        column_values: ${payloadStr}
                     ) {
                         id
                     }
@@ -1024,7 +1022,7 @@
                         item_id: ${itemId},
                         board_id: ${BOARD_ID},
                         column_id: "name",
-                        value: "${itemName}"
+                        value: "${safeItemName}"
                     ) {
                         id
                     }
@@ -1032,10 +1030,16 @@
             `;
 
             try {
-                await callMondayAPI(query);
-                showToast("¡Actualizado en vivo en Monday!");
+                const res = await callMondayAPI(query);
+                if (res.errors) {
+                    console.error("Error devuelto por Monday:", res.errors);
+                    showToast("Aviso: " + res.errors[0].message);
+                } else {
+                    showToast("¡Actualizado con éxito en Monday!");
+                }
             } catch (err) {
                 console.warn("Actualizado localmente:", err);
+                showToast("Guardado localmente. Verifica tu conexión/Token.");
             }
         }
 
