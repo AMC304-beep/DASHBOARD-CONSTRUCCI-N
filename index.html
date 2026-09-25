@@ -15,8 +15,8 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        .fc-toolbar-title { font-size: 1.25rem !important; font-weight: 600; }
-        .fc-event { cursor: pointer; border-radius: 6px; padding: 2px 4px; font-size: 0.85rem; border: none; }
+        .fc-toolbar-title { font-size: 1.15rem !important; font-weight: 600; }
+        .fc-event { cursor: pointer; border-radius: 6px; padding: 2px 4px; font-size: 0.82rem; border: none; }
         .custom-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
@@ -42,9 +42,9 @@
                         <div class="flex items-center text-xs text-slate-500 space-x-2">
                             <span>Board: <b class="text-slate-700">18432588237</b></span>
                             <span>•</span>
-                            <span id="connectionBadge" class="inline-flex items-center text-emerald-600 font-medium">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
-                                Sincronizado en Vivo
+                            <span id="connectionBadge" class="inline-flex items-center text-amber-600 font-medium cursor-pointer" onclick="openTokenModal()">
+                                <span class="w-2 h-2 rounded-full bg-amber-500 mr-1.5 animate-pulse"></span>
+                                Token Pendiente
                             </span>
                         </div>
                     </div>
@@ -62,16 +62,29 @@
                     </button>
                 </div>
 
-                <!-- Botón de Acción Sincronizar -->
+                <!-- Botones de Acción -->
                 <div class="flex items-center space-x-2">
                     <button onclick="syncAllFromMonday(true)" title="Refrescar datos desde Monday" class="flex items-center space-x-1.5 px-3 py-2 text-xs font-semibold bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition border border-blue-200">
                         <i data-lucide="refresh-cw" id="syncIcon" class="w-3.5 h-3.5"></i>
-                        <span class="hidden sm:inline">Sincronizar</span>
+                        <span>Sincronizar</span>
+                    </button>
+                    <button onclick="openTokenModal()" title="Configurar Token de Monday" class="flex items-center space-x-1.5 px-3 py-2 text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg transition border border-slate-300">
+                        <i data-lucide="key" class="w-3.5 h-3.5"></i>
+                        <span class="hidden sm:inline">Token Monday</span>
                     </button>
                 </div>
             </div>
         </div>
     </header>
+
+    <!-- Alerta Informativa si no hay token configurado -->
+    <div id="tokenNoticeBanner" class="bg-amber-50 border-b border-amber-200 px-4 py-2.5 text-xs text-amber-800 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto flex items-center space-x-2 w-full">
+            <i data-lucide="alert-circle" class="w-4 h-4 text-amber-600 flex-shrink-0"></i>
+            <span>Para sincronizar y extraer en vivo <b>todas las columnas y labels del tablero 18432588237</b>, ingresa tu API Token de Monday una sola vez.</span>
+            <button onclick="openTokenModal()" class="ml-auto font-semibold text-blue-700 hover:underline flex-shrink-0">Ingresar Token</button>
+        </div>
+    </div>
 
     <!-- Contenedor Principal -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
@@ -202,6 +215,54 @@
 
     </main>
 
+    <!-- Modal para Configuración del API Token de Monday -->
+    <div id="tokenModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div class="flex items-center space-x-2.5">
+                    <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                        <i data-lucide="key" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-900">Configurar Conexión Monday.com</h3>
+                </div>
+                <button onclick="closeTokenModal()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3.5 py-4 text-xs text-slate-600">
+                <p>Ingresa tu <b>API Token Personal de Monday</b> para habilitar la descarga en vivo de todas las columnas, estados y registros del tablero.</p>
+                
+                <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-1.5 text-[11.5px] text-blue-900">
+                    <p class="font-semibold flex items-center">
+                        <i data-lucide="help-circle" class="w-3.5 h-3.5 mr-1 text-blue-600"></i> ¿Cómo obtener tu Token en Monday?
+                    </p>
+                    <ol class="list-decimal list-inside space-y-1 pl-1 text-blue-800">
+                        <li>En Monday.com haz clic en tu <b>Avatar (Foto de perfil)</b> abajo a la izquierda.</li>
+                        <li>Selecciona <b>Desarrolladores (Developers)</b> o <b>Administration</b>.</li>
+                        <li>Entra a la pestaña <b>Developer</b> &gt; <b>My Access Tokens</b>.</li>
+                        <li>Haz clic en <b>Show</b>, copia el token y pégalo abajo.</li>
+                    </ol>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">Board ID:</label>
+                    <input type="text" id="cfgBoardId" value="18432588237" class="w-full px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 font-mono text-slate-700 text-xs" readonly>
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">Personal API Token (Monday):</label>
+                    <input type="password" id="inputMondayToken" placeholder="eyJhbGciOiJIUzI1NiJ9..." class="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                    <p class="text-[11px] text-slate-400 mt-1">Se almacena únicamente en tu navegador (localStorage) para acceso seguro.</p>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+                <button onclick="closeTokenModal()" class="px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
+                <button onclick="saveMondayToken()" class="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm">Guardar y Sincronizar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Dinámico de Edición de Todas las Columnas -->
     <div id="editDynamicModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] flex flex-col">
@@ -260,7 +321,6 @@
         let statusChartInstance = null;
         let groupsChartInstance = null;
 
-        // Paleta de colores para labels y estados
         const DEFAULT_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#64748b'];
 
         function showToast(msg) {
@@ -291,14 +351,74 @@
         }
 
         // ==========================================
-        // Llamada a la API de Monday vía Proxy
+        // Modal de Configuración de Token
+        // ==========================================
+        function openTokenModal() {
+            document.getElementById('inputMondayToken').value = localStorage.getItem('monday_api_key') || '';
+            document.getElementById('tokenModal').classList.remove('hidden');
+        }
+
+        function closeTokenModal() {
+            document.getElementById('tokenModal').classList.add('hidden');
+        }
+
+        function saveMondayToken() {
+            const token = document.getElementById('inputMondayToken').value.trim();
+            if (token) {
+                localStorage.setItem('monday_api_key', token);
+                updateConnectionStatus();
+                closeTokenModal();
+                showToast("Token guardado correctamente.");
+                syncAllFromMonday(true);
+            } else {
+                alert("Por favor ingresa un token válido.");
+            }
+        }
+
+        function updateConnectionStatus() {
+            const token = localStorage.getItem('monday_api_key');
+            const badge = document.getElementById('connectionBadge');
+            const banner = document.getElementById('tokenNoticeBanner');
+            if (token) {
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>Conectado a Monday`;
+                badge.className = "inline-flex items-center text-emerald-600 font-medium cursor-pointer";
+                if (banner) banner.classList.add('hidden');
+            } else {
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 mr-1.5 animate-pulse"></span>Token Pendiente`;
+                badge.className = "inline-flex items-center text-amber-600 font-medium cursor-pointer";
+                if (banner) banner.classList.remove('hidden');
+            }
+        }
+
+        // ==========================================
+        // Llamada a la API de Monday
         // ==========================================
         async function callMondayAPI(query, variables = {}) {
-            const res = await fetch("/api/monday", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ query, variables })
-            });
+            const token = localStorage.getItem('monday_api_key');
+            if (!token) {
+                throw new Error("NO_TOKEN");
+            }
+
+            let res;
+            try {
+                res = await fetch("https://api.monday.com/v2", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": token,
+                        "API-Version": "2024-01"
+                    },
+                    body: JSON.stringify({ query, variables })
+                });
+            } catch (networkErr) {
+                console.error("Error de red/CORS al conectar con Monday:", networkErr);
+                throw new Error("NETWORK_OR_CORS: " + (networkErr.message || "No se pudo alcanzar api.monday.com"));
+            }
+
+            if (!res.ok) {
+                const txt = await res.text();
+                throw new Error(`HTTP ${res.status}: ${txt}`);
+            }
             return await res.json();
         }
 
@@ -324,7 +444,7 @@
                             type
                             settings_str
                         }
-                        items_page (limit: 100) {
+                        items_page (limit: 250) {
                             items {
                                 id
                                 name
@@ -337,21 +457,6 @@
                                     type
                                     text
                                     value
-                                    ... on StatusValue {
-                                        label
-                                        label_style {
-                                            color
-                                            border
-                                        }
-                                    }
-                                    ... on DateValue {
-                                        date
-                                        time
-                                    }
-                                    ... on TimelineValue {
-                                        from
-                                        to
-                                    }
                                 }
                             }
                         }
@@ -366,28 +471,58 @@
                 const board = data.data?.boards?.[0];
                 if (board) {
                     boardMetadata.name = board.name;
-                    boardMetadata.columns = board.columns || [];
+                    boardMetadata.columns = (board.columns || []).filter(c => c.type !== 'name' && c.id !== 'name');
                     boardMetadata.groups = board.groups || [];
-                    boardItems = board.items_page?.items || [];
+                    
+                    // Parsear items y sus column_values JSON
+                    boardItems = (board.items_page?.items || []).map(item => {
+                        const parsedValues = (item.column_values || []).map(cv => {
+                            let parsedObj = {};
+                            try {
+                                if (cv.value) parsedObj = JSON.parse(cv.value);
+                            } catch (e) {}
+
+                            return {
+                                id: cv.id,
+                                type: cv.type,
+                                text: cv.text || parsedObj.label || '',
+                                label: cv.text || parsedObj.label || '',
+                                date: parsedObj.date || null,
+                                from: parsedObj.from || null,
+                                to: parsedObj.to || null,
+                                raw: parsedObj
+                            };
+                        });
+
+                        return {
+                            id: item.id,
+                            name: item.name,
+                            group: item.group || { id: 'default', title: 'General' },
+                            column_values: parsedValues
+                        };
+                    });
 
                     document.getElementById('boardNameHeader').innerText = board.name || "Tablero de Monday";
-
-                    // Guardar en almacenamiento local
                     localStorage.setItem('cached_monday_board', JSON.stringify({ boardMetadata, boardItems }));
 
                     renderDynamicUI();
-                    if (showFeedback) showToast(`Sincronizados ${boardItems.length} elementos con todas las columnas.`);
+                    if (showFeedback) showToast(`Sincronizados ${boardItems.length} registros y ${boardMetadata.columns.length} columnas.`);
+                } else {
+                    throw new Error("No se encontró el tablero con ID " + BOARD_ID);
                 }
             } catch (err) {
-                console.warn("Usando datos locales o de demostración:", err);
+                console.error("Error al sincronizar con Monday:", err);
+                if (err.message === "NO_TOKEN") {
+                    if (showFeedback) openTokenModal();
+                } else {
+                    if (showFeedback) showToast("Error al conectar con Monday: " + err.message);
+                }
                 loadFallbackOrCached();
-                if (showFeedback) showToast("Se cargaron los datos almacenados localmente.");
             } finally {
                 if (icon) icon.classList.remove('animate-spin');
             }
         }
 
-        // Carga de respaldo si no hay conexión en ese momento
         function loadFallbackOrCached() {
             const cached = localStorage.getItem('cached_monday_board');
             if (cached) {
@@ -395,7 +530,6 @@
                 boardMetadata = parsed.boardMetadata;
                 boardItems = parsed.boardItems;
             } else {
-                // Estructura demo completa
                 boardMetadata = {
                     name: "Control de Ausencias & Cronograma",
                     columns: [
@@ -461,9 +595,6 @@
             renderDynamicUI();
         }
 
-        // ==========================================
-        // Renderizado Dinámico de la Interfaz
-        // ==========================================
         function renderDynamicUI() {
             renderKpis();
             renderTableHead();
@@ -474,7 +605,6 @@
             lucide.createIcons();
         }
 
-        // 1. Renderizar KPIs basados en los estados/labels
         function renderKpis() {
             const grid = document.getElementById('dynamicKpisGrid');
             grid.innerHTML = '';
@@ -491,7 +621,6 @@
                 counts[statusVal] = (counts[statusVal] || 0) + 1;
             });
 
-            // Card Total
             grid.innerHTML += `
                 <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
@@ -504,7 +633,6 @@
                 </div>
             `;
 
-            // Cards por cada label detectado
             const labels = Object.keys(counts).filter(k => k !== 'Total');
             labels.slice(0, 3).forEach((label, idx) => {
                 const color = DEFAULT_COLORS[idx % DEFAULT_COLORS.length];
@@ -522,7 +650,6 @@
             });
         }
 
-        // 2. Renderizar Cabecera de la Tabla Dinámica
         function renderTableHead() {
             const thead = document.getElementById('dynamicTableHead');
             thead.innerHTML = `
@@ -535,7 +662,6 @@
             `;
         }
 
-        // 3. Renderizar Filas de la Tabla con todas las columnas
         function renderTableBody(filterText = '') {
             const tbody = document.getElementById('dynamicTableBody');
             tbody.innerHTML = '';
@@ -604,7 +730,6 @@
             renderTableBody(query);
         }
 
-        // 4. Formulario de Creación con inputs para cada columna de Monday
         function renderCreateFormFields() {
             const container = document.getElementById('dynamicFormFields');
             container.innerHTML = '';
@@ -612,14 +737,28 @@
             boardMetadata.columns.forEach(col => {
                 let inputHtml = '';
                 if (col.type === 'status') {
-                    // Extraer labels conocidos
-                    const knownLabels = [...new Set(boardItems.map(it => {
-                        const v = it.column_values.find(cv => cv.id === col.id);
-                        return v ? v.text : null;
-                    }).filter(Boolean))];
+                    let labelsFromSettings = [];
+                    try {
+                        if (col.settings_str) {
+                            const parsedSettings = JSON.parse(col.settings_str);
+                            if (parsedSettings.labels) {
+                                labelsFromSettings = Object.values(parsedSettings.labels).filter(Boolean);
+                            }
+                        }
+                    } catch (e) {}
 
-                    const options = (knownLabels.length > 0 ? knownLabels : ['Aprobado', 'Pendiente', 'Rechazado', 'Vacaciones', 'Permiso'])
-                        .map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                    const knownLabels = [...new Set([
+                        ...labelsFromSettings,
+                        ...boardItems.map(it => {
+                            const v = it.column_values.find(cv => cv.id === col.id);
+                            return v ? v.text : null;
+                        }).filter(Boolean)
+                    ])];
+
+                    const defaultFallback = ['Aprobado', 'Pendiente', 'Rechazado', 'Vacaciones', 'Permiso'];
+                    const finalLabels = knownLabels.length > 0 ? knownLabels : defaultFallback;
+
+                    const options = finalLabels.map(opt => `<option value="${opt}">${opt}</option>`).join('');
 
                     inputHtml = `
                         <div>
@@ -661,9 +800,6 @@
             });
         }
 
-        // ==========================================
-        // Modal de Edición Dinámico
-        // ==========================================
         function openEditModal(itemId) {
             const item = boardItems.find(i => i.id === itemId);
             if (!item) return;
@@ -680,13 +816,28 @@
 
                 let inputHtml = '';
                 if (col.type === 'status') {
-                    const knownLabels = [...new Set(boardItems.map(it => {
-                        const v = it.column_values.find(cv => cv.id === col.id);
-                        return v ? v.text : null;
-                    }).filter(Boolean))];
+                    let labelsFromSettings = [];
+                    try {
+                        if (col.settings_str) {
+                            const parsedSettings = JSON.parse(col.settings_str);
+                            if (parsedSettings.labels) {
+                                labelsFromSettings = Object.values(parsedSettings.labels).filter(Boolean);
+                            }
+                        }
+                    } catch (e) {}
 
-                    const options = (knownLabels.length > 0 ? knownLabels : ['Aprobado', 'Pendiente', 'Rechazado', 'Vacaciones', 'Permiso'])
-                        .map(opt => `<option value="${opt}" ${opt === currentText ? 'selected' : ''}>${opt}</option>`).join('');
+                    const knownLabels = [...new Set([
+                        ...labelsFromSettings,
+                        ...boardItems.map(it => {
+                            const v = it.column_values.find(cv => cv.id === col.id);
+                            return v ? v.text : null;
+                        }).filter(Boolean)
+                    ])];
+
+                    const defaultFallback = ['Aprobado', 'Pendiente', 'Rechazado', 'Vacaciones', 'Permiso'];
+                    const finalLabels = knownLabels.length > 0 ? knownLabels : defaultFallback;
+
+                    const options = finalLabels.map(opt => `<option value="${opt}" ${opt === currentText ? 'selected' : ''}>${opt}</option>`).join('');
 
                     inputHtml = `
                         <div>
@@ -741,9 +892,6 @@
             document.getElementById('editDynamicModal').classList.add('hidden');
         }
 
-        // ==========================================
-        // Operaciones de Creación, Edición y Borrado
-        // ==========================================
         async function handleCreateItem(e) {
             e.preventDefault();
             const form = document.getElementById('dynamicCreateForm');
@@ -793,7 +941,6 @@
             form.reset();
             showToast("Creando elemento en Monday...");
 
-            // Mutación GraphQL en Monday
             const query = `
                 mutation {
                     create_item (
@@ -910,11 +1057,7 @@
             }
         }
 
-        // ==========================================
-        // Gráficos de Labels y Grupos de Monday
-        // ==========================================
         function updateCharts() {
-            // Chart 1: Donut por Estados
             const statusCol = boardMetadata.columns.find(c => c.type === 'status' || c.id.includes('status'));
             const statusCounts = {};
             boardItems.forEach(item => {
@@ -946,7 +1089,6 @@
                 }
             });
 
-            // Chart 2: Grupos de Monday
             const groupCounts = {};
             boardItems.forEach(item => {
                 const grp = item.group?.title || 'Principal';
@@ -977,9 +1119,6 @@
             });
         }
 
-        // ==========================================
-        // Calendario & Cronograma
-        // ==========================================
         function populateCalendar() {
             if (!calendar) return;
             calendar.removeAllEvents();
@@ -987,7 +1126,6 @@
             const filterPerson = document.getElementById('calendarFilterPerson')?.value || 'ALL';
             const filterSelect = document.getElementById('calendarFilterPerson');
             
-            // Llenar select de personas
             const allPeople = [...new Set(boardItems.map(i => {
                 const personCol = i.column_values.find(c => c.type === 'people' || c.id.includes('person') || c.id.includes('colaborador'));
                 return personCol?.text || i.name.split('-')[0].trim();
@@ -1000,19 +1138,12 @@
                 filterSelect.value = current || 'ALL';
             }
 
-            // Mapear eventos
             const timelineCol = boardMetadata.columns.find(c => c.type === 'timeline' || c.type === 'date');
             const statusCol = boardMetadata.columns.find(c => c.type === 'status');
 
             boardItems.forEach(item => {
                 let start = null;
                 let end = null;
-                let statusText = 'Evento';
-
-                if (statusCol) {
-                    const st = item.column_values.find(v => v.id === statusCol.id);
-                    if (st && st.text) statusText = st.text;
-                }
 
                 if (timelineCol) {
                     const tv = item.column_values.find(v => v.id === timelineCol.id);
@@ -1028,7 +1159,6 @@
                 }
 
                 if (!start) {
-                    // Buscar en cualquier campo que parezca fecha
                     const dateVal = item.column_values.find(v => v.type === 'date' || v.type === 'timeline');
                     if (dateVal) {
                         start = dateVal.from || dateVal.date;
@@ -1059,8 +1189,9 @@
             populateCalendar();
         }
 
-        // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
+            updateConnectionStatus();
+
             const calendarEl = document.getElementById('calendar');
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
