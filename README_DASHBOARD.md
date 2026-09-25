@@ -1,40 +1,43 @@
-# Dashboard de Ausencias, Aprobaciones y Cronograma (Monday.com)
+# Dashboard Completo de Monday.com (Todas las Columnas & Labels)
 
-Aplicación web interactiva conectada **en tiempo real y de forma bidireccional** con el tablero de Monday.com:
+Dashboard conectado **en tiempo real y de forma automática** con el tablero de Monday.com:
 - **Tablero ID**: `18432588237`
 - **URL Monday**: [https://ibm.monday.com/boards/18432588237](https://ibm.monday.com/boards/18432588237)
-- **Acceso Web GitHub Pages**: [https://amc304-beep.github.io/DASHBOARD-CONSTRUCCI-N/](https://amc304-beep.github.io/DASHBOARD-CONSTRUCCI-N/)
 
 ---
 
-## ⚡ Sincronización Automática con Monday.com
+## ⚡ Extracción y Renderizado Completo de Columnas y Labels
 
-Cualquier acción realizada dentro del dashboard se refleja de forma inmediata en el tablero de Monday:
+El sistema ya no depende de estructuras fijas. Realiza una introspección completa del tablero de Monday y extrae:
 
-1. **Crear Solicitud**: Crea un nuevo elemento (*item*) en el tablero con los valores de estado, cronograma (fechas) y observaciones.
-2. **Editar Solicitud**: Al modificar el estado, las fechas, el nombre o los motivos desde el modal de edición, ejecuta las mutaciones GraphQL `change_multiple_column_values` y `change_simple_column_value` directamente sobre Monday.
-3. **Aprobar / Rechazar rápido**: Actualiza en vivo la columna de estado en Monday.
-4. **Eliminar**: Elimina el elemento correspondiente del tablero en Monday (`delete_item`).
-5. **Carga y Sincronización Inicial**: Detecta automáticamente la estructura de columnas del tablero (Estado, Cronograma, Fechas y Texto) para mapear los campos dinámicamente.
+1. **Todas las Columnas del Tablero**:
+   - `status` (Estados / Labels configurados con sus estilos y colores).
+   - `people` (Colaboradores / Asignaciones).
+   - `timeline` / `date` (Cronograma, Rangos de fechas e inicio/fin).
+   - `text` / `long_text` (Comentarios, descripciones y notas).
+   - `dropdown`, `numbers`, `tags`, etc.
 
----
+2. **Extracción Dinámica de Labels**:
+   - Los KPIs superiores y los gráficos se adaptan a los labels y grupos reales que existan en el tablero.
+   - El formulario de creación y de edición autogenera los desplegables (`<select>`) con las opciones/labels exactos de Monday.
 
-## 🖥️ Estructura de Slides
+3. **Edición Bidireccional en Tiempo Real**:
+   - Al editar cualquier columna de un elemento desde el modal, se envían las mutaciones GraphQL a Monday para actualizar el nombre y todos los valores de las columnas.
+   - Si creas un nuevo elemento, se crea en Monday con todas sus columnas asignadas.
+   - Si eliminas un elemento, se borra de Monday automáticamente.
 
-### Slide 1: Gestión de Aprobaciones y Solicitudes
-- **KPIs y Métricas**: Conteo en vivo de Total, Aprobadas, Rechazadas y Pendientes.
-- **Cuadro de Nueva Solicitud**: Formulario con validación de fechas e inserción inmediata a Monday.
-- **Tabla Interactiva**: Botones de **Editar**, **Aprobar** (✅) y **Rechazar** (❌).
-- **Gráficos**: Distribución por estado (Doughnut) y volumen por tipo de ausencia (Bar Chart).
-
-### Slide 2: Cronograma y Calendario General
-- **FullCalendar**: Vista mensual, semanal y en lista de las ausencias aprobadas.
-- **Filtro por Colaborador**: Visualización aislada por miembro del equipo o general.
-- **Edición desde el Calendario**: Al hacer clic en cualquier bloque o evento del calendario se abre la ventana de edición para ajustar fechas o detalles en tiempo real.
+4. **Slide 2 - Cronograma & Calendario**:
+   - Detecta automáticamente las columnas de tipo `timeline` o `date` de cada persona y las plasma en el calendario interactivo con vista mensual, semanal y en lista.
 
 ---
 
-## 🔒 Configuración del Token
-1. Haz clic en el botón superior derecho **"Configurar Token"**.
-2. Pega tu Token personal de Monday y pulsa **"Guardar y Conectar"**.
-3. El token queda guardado únicamente en tu navegador (`localStorage`), garantizando máxima seguridad sin exponer claves en el repositorio.
+## 🚀 Despliegue con Token Oculto (Vercel)
+
+1. Sube los archivos a tu repositorio de GitHub:
+   - `index.html`
+   - `api/monday.js`
+   - `vercel.json`
+2. En [Vercel.com](https://vercel.com), importa tu repositorio y agrega en **Environment Variables**:
+   - **Key**: `MONDAY_API_KEY`
+   - **Value**: *(Tu API Token personal de Monday)*
+3. Haz clic en **Deploy**. ¡Tu equipo podrá usar el dashboard y editar todas las columnas de Monday sin ingresar ningún token!
