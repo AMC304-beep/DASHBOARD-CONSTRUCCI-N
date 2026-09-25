@@ -54,19 +54,19 @@
                 <div class="flex items-center bg-slate-100 p-1.5 rounded-xl border border-slate-200">
                     <button id="tabBtnSlide1" onclick="switchSlide(1)" class="flex items-center space-x-2 px-3.5 py-2 rounded-lg font-medium text-xs sm:text-sm transition-all duration-200 bg-white text-blue-600 shadow-sm">
                         <i data-lucide="table" class="w-4 h-4"></i>
-                        <span>Gestión de Datos</span>
+                        <span>Slide 1: Gestión & Aprobaciones</span>
                     </button>
                     <button id="tabBtnSlide2" onclick="switchSlide(2)" class="flex items-center space-x-2 px-3.5 py-2 rounded-lg font-medium text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-all duration-200">
                         <i data-lucide="calendar" class="w-4 h-4"></i>
-                        <span>Cronograma General</span>
+                        <span>Slide 2: Calendario Cronograma</span>
                     </button>
                 </div>
 
                 <!-- Botones de Acción -->
                 <div class="flex items-center space-x-2">
-                    <button onclick="syncAllFromMonday(true)" title="Refrescar datos desde Monday" class="flex items-center space-x-1.5 px-3 py-2 text-xs font-semibold bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition border border-blue-200">
+                    <button onclick="syncAllFromMonday(true)" title="Refrescar datos desde Monday" class="flex items-center space-x-1.5 px-3 py-2 text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition shadow-sm">
                         <i data-lucide="refresh-cw" id="syncIcon" class="w-3.5 h-3.5"></i>
-                        <span>Sincronizar</span>
+                        <span>Sincronizar Monday</span>
                     </button>
                     <button onclick="openTokenModal()" title="Configurar Token de Monday" class="flex items-center space-x-1.5 px-3 py-2 text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg transition border border-slate-300">
                         <i data-lucide="key" class="w-3.5 h-3.5"></i>
@@ -81,8 +81,8 @@
     <div id="tokenNoticeBanner" class="bg-amber-50 border-b border-amber-200 px-4 py-2.5 text-xs text-amber-800 flex items-center justify-between">
         <div class="max-w-7xl mx-auto flex items-center space-x-2 w-full">
             <i data-lucide="alert-circle" class="w-4 h-4 text-amber-600 flex-shrink-0"></i>
-            <span>Para sincronizar y extraer en vivo <b>todas las columnas y labels del tablero 18432588237</b>, ingresa tu API Token de Monday una sola vez.</span>
-            <button onclick="openTokenModal()" class="ml-auto font-semibold text-blue-700 hover:underline flex-shrink-0">Ingresar Token</button>
+            <span>Para conectar directamente con tu tablero <b>18432588237</b> en Monday y sincronizar <b>Adcar, Motivo Gerencia, Cronograma y Estado de Aprobación</b>, haz clic aquí:</span>
+            <button onclick="openTokenModal()" class="ml-auto font-bold bg-amber-600 text-white px-3 py-1 rounded-lg hover:bg-amber-700 flex-shrink-0">Conectar Token Monday</button>
         </div>
     </div>
 
@@ -231,7 +231,7 @@
             </div>
 
             <div class="space-y-3.5 py-4 text-xs text-slate-600">
-                <p>Ingresa tu <b>API Token Personal de Monday</b> para habilitar la descarga en vivo de todas las columnas, estados y registros del tablero.</p>
+                <p>Ingresa tu <b>API Token Personal de Monday</b> para habilitar la descarga en vivo de las columnas <b>Adcar, Motivo Gerencia, Cronograma y Estado de Aprobación</b>, y activar la edición inmediata.</p>
                 
                 <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-1.5 text-[11.5px] text-blue-900">
                     <p class="font-semibold flex items-center">
@@ -241,7 +241,7 @@
                         <li>En Monday.com haz clic en tu <b>Avatar (Foto de perfil)</b> abajo a la izquierda.</li>
                         <li>Selecciona <b>Desarrolladores (Developers)</b> o <b>Administration</b>.</li>
                         <li>Entra a la pestaña <b>Developer</b> &gt; <b>My Access Tokens</b>.</li>
-                        <li>Haz clic en <b>Show</b>, copia el token y pégalo abajo.</li>
+                        <li>Haz clic en <b>Show</b>, copia el token y pégalo en el campo inferior.</li>
                     </ol>
                 </div>
 
@@ -251,8 +251,8 @@
                 </div>
                 <div>
                     <label class="block font-medium text-slate-700 mb-1">Personal API Token (Monday):</label>
-                    <input type="password" id="inputMondayToken" placeholder="eyJhbGciOiJIUzI1NiJ9..." class="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
-                    <p class="text-[11px] text-slate-400 mt-1">Se almacena únicamente en tu navegador (localStorage) para acceso seguro.</p>
+                    <input type="password" id="inputMondayToken" placeholder="Pega tu token aquí..." class="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                    <p class="text-[11px] text-slate-400 mt-1">Se almacena de forma privada en tu navegador (localStorage) para no pedírtelo nuevamente.</p>
                 </div>
             </div>
 
@@ -399,13 +399,16 @@
                 throw new Error("NO_TOKEN");
             }
 
+            // Sanitizar el token: eliminar comillas accidentales, espacios o prefijos "Bearer"
+            const cleanToken = token.replace(/^Bearer\s+/i, '').replace(/["']/g, '').trim();
+
             let res;
             try {
                 res = await fetch("https://api.monday.com/v2", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": token,
+                        "Authorization": cleanToken,
                         "API-Version": "2024-01"
                     },
                     body: JSON.stringify({ query, variables })
@@ -416,8 +419,16 @@
             }
 
             if (!res.ok) {
-                const txt = await res.text();
-                throw new Error(`HTTP ${res.status}: ${txt}`);
+                let errorDetails = `HTTP ${res.status}`;
+                try {
+                    const errorJson = await res.json();
+                    if (errorJson.error_message) errorDetails += `: ${errorJson.error_message}`;
+                    else if (errorJson.errors) errorDetails += `: ${JSON.stringify(errorJson.errors)}`;
+                } catch (e) {
+                    const txt = await res.text();
+                    if (txt) errorDetails += `: ${txt}`;
+                }
+                throw new Error(errorDetails);
             }
             return await res.json();
         }
@@ -430,8 +441,8 @@
             if (icon) icon.classList.add('animate-spin');
 
             const query = `
-                query {
-                    boards(ids: [${BOARD_ID}]) {
+                query GetMondayBoard($boardId: [ID!]) {
+                    boards(ids: $boardId) {
                         name
                         groups {
                             id
@@ -444,7 +455,7 @@
                             type
                             settings_str
                         }
-                        items_page (limit: 250) {
+                        items_page(limit: 250) {
                             items {
                                 id
                                 name
@@ -465,7 +476,7 @@
             `;
 
             try {
-                const data = await callMondayAPI(query);
+                const data = await callMondayAPI(query, { boardId: [BOARD_ID] });
                 if (data.errors) throw new Error(data.errors[0].message);
 
                 const board = data.data?.boards?.[0];
@@ -925,7 +936,7 @@
             });
 
             const newItem = {
-                id: Date.now().toString(),
+                id: "temp_" + Date.now().toString(),
                 name: itemName,
                 group: { id: "group_1", title: "Principal" },
                 column_values: localColumnValues
@@ -937,11 +948,11 @@
             showToast("Creando elemento en Monday...");
 
             const query = `
-                mutation {
+                mutation CreateItem($boardId: ID!, $itemName: String!, $colVals: JSON!) {
                     create_item (
-                        board_id: ${BOARD_ID},
-                        item_name: "${itemName}",
-                        column_values: ${JSON.stringify(JSON.stringify(colValuesPayload))}
+                        board_id: $boardId,
+                        item_name: $itemName,
+                        column_values: $colVals
                     ) {
                         id
                     }
@@ -949,10 +960,16 @@
             `;
 
             try {
-                const data = await callMondayAPI(query);
+                const data = await callMondayAPI(query, {
+                    boardId: BOARD_ID,
+                    itemName: itemName,
+                    colVals: JSON.stringify(colValuesPayload)
+                });
                 if (data.data?.create_item?.id) {
                     newItem.id = data.data.create_item.id;
                     showToast("¡Elemento creado exitosamente en Monday!");
+                } else if (data.errors) {
+                    showToast("Aviso al crear en Monday: " + data.errors[0].message);
                 }
             } catch (err) {
                 console.warn("Elemento guardado localmente:", err);
@@ -1006,23 +1023,20 @@
             renderDynamicUI();
             showToast("Actualizando de inmediato en Monday...");
 
-            const payloadStr = JSON.stringify(JSON.stringify(colValuesPayload));
-            const safeItemName = itemName.replace(/"/g, '\\"');
-
             const query = `
-                mutation {
+                mutation UpdateMondayItem($itemId: ID!, $boardId: ID!, $colVals: JSON!, $nameVal: String!) {
                     change_multiple_column_values (
-                        item_id: ${itemId},
-                        board_id: ${BOARD_ID},
-                        column_values: ${payloadStr}
+                        item_id: $itemId,
+                        board_id: $boardId,
+                        column_values: $colVals
                     ) {
                         id
                     }
                     change_simple_column_value (
-                        item_id: ${itemId},
-                        board_id: ${BOARD_ID},
+                        item_id: $itemId,
+                        board_id: $boardId,
                         column_id: "name",
-                        value: "${safeItemName}"
+                        value: $nameVal
                     ) {
                         id
                     }
@@ -1030,16 +1044,21 @@
             `;
 
             try {
-                const res = await callMondayAPI(query);
+                const res = await callMondayAPI(query, {
+                    itemId: itemId,
+                    boardId: BOARD_ID,
+                    colVals: JSON.stringify(colValuesPayload),
+                    nameVal: itemName
+                });
                 if (res.errors) {
                     console.error("Error devuelto por Monday:", res.errors);
                     showToast("Aviso: " + res.errors[0].message);
                 } else {
-                    showToast("¡Actualizado con éxito en Monday!");
+                    showToast("¡Actualizado de inmediato en Monday!");
                 }
             } catch (err) {
                 console.warn("Actualizado localmente:", err);
-                showToast("Guardado localmente. Verifica tu conexión/Token.");
+                showToast("Guardado localmente. Error: " + err.message);
             }
         }
 
@@ -1051,9 +1070,15 @@
                 renderDynamicUI();
                 showToast("Eliminando de Monday...");
 
-                const query = `mutation { delete_item (item_id: ${itemId}) { id } }`;
+                const query = `
+                    mutation DeleteMondayItem($itemId: ID!) {
+                        delete_item (item_id: $itemId) {
+                            id
+                        }
+                    }
+                `;
                 try {
-                    await callMondayAPI(query);
+                    await callMondayAPI(query, { itemId: itemId });
                     showToast("Elemento eliminado de Monday.");
                 } catch (e) {
                     console.warn("Eliminado localmente:", e);
