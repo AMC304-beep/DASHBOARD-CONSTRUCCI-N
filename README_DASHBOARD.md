@@ -1,40 +1,40 @@
 # Dashboard de Ausencias, Aprobaciones y Cronograma (Monday.com)
 
-Aplicación web interactiva creada para visualizar, gestionar y solicitar ausencias del equipo conectada con el tablero de Monday.com:
+Aplicación web interactiva conectada **en tiempo real y de forma bidireccional** con el tablero de Monday.com:
 - **Tablero ID**: `18432588237`
 - **URL Monday**: [https://ibm.monday.com/boards/18432588237](https://ibm.monday.com/boards/18432588237)
+- **Acceso Web GitHub Pages**: [https://amc304-beep.github.io/DASHBOARD-CONSTRUCCI-N/](https://amc304-beep.github.io/DASHBOARD-CONSTRUCCI-N/)
 
 ---
 
-## 🎯 Características Principales
+## ⚡ Sincronización Automática con Monday.com
 
-### 1. Slide 1: Gestión de Solicitudes y Decisiones
-- **KPIs y Métricas**: Resumen visual de solicitudes Totales, Aprobadas, Rechazadas y Pendientes.
-- **Cuadro de Nueva Solicitud de Ausencias**: Formulario con validación de fechas (Inicio / Fin), tipo de ausencia (Vacaciones, Permisos, Incapacidad, Día de la Familia, Capacitaciones, etc.) y comentarios.
-- **Tabla de Gestión**: Visualización del historial, estado actual, filtrado rápido (`Todos`, `Aprobados`, `Rechazados`, `Pendientes`) y botones de acción rápida para aprobar o rechazar solicitudes pendientes.
-- **Gráficos Estadísticos**: Gráficos interactivos de dona (distribución por estado) y barras (tipos de ausencia más solicitados).
+Cualquier acción realizada dentro del dashboard se refleja de forma inmediata en el tablero de Monday:
 
-### 2. Slide 2: Calendario y Cronograma General
-- **Calendario Interactivo (FullCalendar)**: Vista mensual, semanal y en lista del cronograma aprobado de todo el equipo.
-- **Filtro por Colaborador**: Capacidad de filtrar la vista del calendario para una persona específica o ver a todo el equipo simultáneamente.
-- **Código de Colores por Ausencia**:
-  - 🟢 **Verde**: Vacaciones
-  - 🔵 **Azul**: Permiso Personal
-  - 🟡 **Amarillo**: Día de la Familia / Cumpleaños
-  - 🟣 **Morado**: Capacitación / Formación
-  - 🔴 **Rojo**: Incapacidades Médicas / Calamidades
-
-### 3. Conexión con Monday.com
-- Configuración mediante **API Token personal de Monday** directamente desde la interfaz del dashboard (botón *Conexión Monday.com*).
-- Integración con GraphQL API v2 de Monday para crear items automáticamente en el tablero `18432588237` y sincronizar estados.
-- Soporta persistencia local (`localStorage`) para uso inmediato o modo demo sin requerir backend adicional.
+1. **Crear Solicitud**: Crea un nuevo elemento (*item*) en el tablero con los valores de estado, cronograma (fechas) y observaciones.
+2. **Editar Solicitud**: Al modificar el estado, las fechas, el nombre o los motivos desde el modal de edición, ejecuta las mutaciones GraphQL `change_multiple_column_values` y `change_simple_column_value` directamente sobre Monday.
+3. **Aprobar / Rechazar rápido**: Actualiza en vivo la columna de estado en Monday.
+4. **Eliminar**: Elimina el elemento correspondiente del tablero en Monday (`delete_item`).
+5. **Carga y Sincronización Inicial**: Detecta automáticamente la estructura de columnas del tablero (Estado, Cronograma, Fechas y Texto) para mapear los campos dinámicamente.
 
 ---
 
-## 🚀 Cómo abrir y usar el Dashboard
+## 🖥️ Estructura de Slides
 
-1. Abre el archivo [`dashboard_ausencias.html`](dashboard_ausencias.html) en cualquier navegador moderno (Chrome, Edge, Firefox).
-2. Haz clic en el botón superior **"Conexión Monday.com"** para agregar tu token de API si deseas sincronizar en tiempo real con Monday.
-3. Navega libremente entre los dos slides con los botones superiores:
-   - **Gestión & Solicitudes**
-   - **Calendario de Equipo**
+### Slide 1: Gestión de Aprobaciones y Solicitudes
+- **KPIs y Métricas**: Conteo en vivo de Total, Aprobadas, Rechazadas y Pendientes.
+- **Cuadro de Nueva Solicitud**: Formulario con validación de fechas e inserción inmediata a Monday.
+- **Tabla Interactiva**: Botones de **Editar**, **Aprobar** (✅) y **Rechazar** (❌).
+- **Gráficos**: Distribución por estado (Doughnut) y volumen por tipo de ausencia (Bar Chart).
+
+### Slide 2: Cronograma y Calendario General
+- **FullCalendar**: Vista mensual, semanal y en lista de las ausencias aprobadas.
+- **Filtro por Colaborador**: Visualización aislada por miembro del equipo o general.
+- **Edición desde el Calendario**: Al hacer clic en cualquier bloque o evento del calendario se abre la ventana de edición para ajustar fechas o detalles en tiempo real.
+
+---
+
+## 🔒 Configuración del Token
+1. Haz clic en el botón superior derecho **"Configurar Token"**.
+2. Pega tu Token personal de Monday y pulsa **"Guardar y Conectar"**.
+3. El token queda guardado únicamente en tu navegador (`localStorage`), garantizando máxima seguridad sin exponer claves en el repositorio.
