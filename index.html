@@ -482,7 +482,27 @@
                 const board = data.data?.boards?.[0];
                 if (board) {
                     boardMetadata.name = board.name;
-                    boardMetadata.columns = (board.columns || []).filter(c => c.type !== 'name' && c.id !== 'name');
+                    // Excluir 'name' y columnas no deseadas: 'soporte ausencia', 'aprobacion', 'dias ausencias'
+                    const excludedTitles = [
+                        'soporte ausencia', 'soporte ausencias', 'soporte de ausencia', 'soporte',
+                        'aprobacion', 'aprobación',
+                        'dias ausencias', 'días ausencias', 'dias ausencia', 'días ausencia', 'dias de ausencia', 'días de ausencia', 'dias'
+                    ];
+                    
+                    boardMetadata.columns = (board.columns || []).filter(c => {
+                        if (c.type === 'name' || c.id === 'name') return false;
+                        const titleLower = (c.title || '').toLowerCase().trim();
+                        const idLower = (c.id || '').toLowerCase().trim();
+                        
+                        // Verificar si coincide con alguna de las columnas a eliminar
+                        const isExcluded = excludedTitles.some(ex => titleLower === ex || titleLower.includes(ex) || idLower.includes(ex.replace(/\s+/g, '_')));
+                        
+                        // Asegurar que no excluya por error 'estado de aprobacion' si coincide con 'aprobacion'
+                        if (titleLower.includes('estado') && titleLower.includes('aprob')) {
+                            return true; // Conservar 'Estado de Aprobación'
+                        }
+                        return !isExcluded;
+                    });
                     boardMetadata.groups = board.groups || [];
                     
                     // Parsear items y sus column_values JSON
