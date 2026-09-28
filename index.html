@@ -34,8 +34,41 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-blue-500/20">
-                        <i data-lucide="trello" class="w-5 h-5"></i>
+                    <!-- Logo Oficial IBM -->
+                    <div class="h-10 px-3 bg-slate-900 rounded-xl flex items-center justify-center shadow-md shadow-slate-900/10 border border-slate-800">
+                        <svg class="h-5 w-auto" viewBox="0 0 240 96" fill="white" xmlns="http://www.w3.org/2000/svg">
+                            <rect y="0" width="40" height="8" fill="#ffffff" />
+                            <rect y="16" width="40" height="8" fill="#ffffff" />
+                            <rect y="32" width="40" height="8" fill="#ffffff" />
+                            <rect y="48" width="40" height="8" fill="#ffffff" />
+                            <rect y="64" width="40" height="8" fill="#ffffff" />
+                            <rect y="80" width="40" height="8" fill="#ffffff" />
+                            <rect x="56" y="0" width="80" height="8" fill="#ffffff" />
+                            <rect x="56" y="16" width="24" height="8" fill="#ffffff" />
+                            <rect x="112" y="16" width="24" height="8" fill="#ffffff" />
+                            <rect x="56" y="32" width="24" height="8" fill="#ffffff" />
+                            <rect x="112" y="32" width="24" height="8" fill="#ffffff" />
+                            <rect x="56" y="44" width="80" height="8" fill="#ffffff" />
+                            <rect x="56" y="56" width="24" height="8" fill="#ffffff" />
+                            <rect x="112" y="56" width="24" height="8" fill="#ffffff" />
+                            <rect x="56" y="68" width="24" height="8" fill="#ffffff" />
+                            <rect x="112" y="68" width="24" height="8" fill="#ffffff" />
+                            <rect x="56" y="80" width="80" height="8" fill="#ffffff" />
+                            <rect x="152" y="0" width="24" height="8" fill="#ffffff" />
+                            <rect x="180" y="0" width="24" height="8" fill="#ffffff" />
+                            <rect x="208" y="0" width="24" height="8" fill="#ffffff" />
+                            <rect x="152" y="16" width="24" height="8" fill="#ffffff" />
+                            <rect x="180" y="16" width="24" height="8" fill="#ffffff" />
+                            <rect x="208" y="16" width="24" height="8" fill="#ffffff" />
+                            <rect x="152" y="32" width="24" height="8" fill="#ffffff" />
+                            <rect x="180" y="32" width="24" height="8" fill="#ffffff" />
+                            <rect x="208" y="32" width="24" height="8" fill="#ffffff" />
+                            <rect x="152" y="48" width="80" height="8" fill="#ffffff" />
+                            <rect x="152" y="64" width="24" height="8" fill="#ffffff" />
+                            <rect x="208" y="64" width="24" height="8" fill="#ffffff" />
+                            <rect x="152" y="80" width="24" height="8" fill="#ffffff" />
+                            <rect x="208" y="80" width="24" height="8" fill="#ffffff" />
+                        </svg>
                     </div>
                     <div>
                         <h1 id="boardNameHeader" class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Tablero de Ausencias & Gestión</h1>
@@ -54,7 +87,7 @@
                 <div class="flex items-center bg-slate-100 p-1.5 rounded-xl border border-slate-200">
                     <button id="tabBtnSlide1" onclick="switchSlide(1)" class="flex items-center space-x-2 px-3.5 py-2 rounded-lg font-medium text-xs sm:text-sm transition-all duration-200 bg-white text-blue-600 shadow-sm">
                         <i data-lucide="table" class="w-4 h-4"></i>
-                        <span>Slide 1: Gestión & Aprobaciones</span>
+                        <span>Slide 1: Solicitudes Enviadas</span>
                     </button>
                     <button id="tabBtnSlide2" onclick="switchSlide(2)" class="flex items-center space-x-2 px-3.5 py-2 rounded-lg font-medium text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition-all duration-200">
                         <i data-lucide="calendar" class="w-4 h-4"></i>
@@ -482,10 +515,11 @@
                 const board = data.data?.boards?.[0];
                 if (board) {
                     boardMetadata.name = board.name;
-                    // Excluir 'name' y columnas no deseadas: 'soporte ausencia', 'aprobacion', 'dias ausencias'
+                    // Excluir 'name' y columnas no deseadas: 'soporte ausencia', 'aprobacion', 'estado de aprobacion', 'dias ausencias'
                     const excludedTitles = [
                         'soporte ausencia', 'soporte ausencias', 'soporte de ausencia', 'soporte',
                         'aprobacion', 'aprobación',
+                        'estado de aprobacion', 'estado de aprobación', 'estado aprobacion', 'estado aprobación', 'aprobacion estado',
                         'dias ausencias', 'días ausencias', 'dias ausencia', 'días ausencia', 'dias de ausencia', 'días de ausencia', 'dias'
                     ];
                     
@@ -494,18 +528,12 @@
                         const titleLower = (c.title || '').toLowerCase().trim();
                         const idLower = (c.id || '').toLowerCase().trim();
                         
-                        // Verificar si coincide con alguna de las columnas a eliminar
                         const isExcluded = excludedTitles.some(ex => titleLower === ex || titleLower.includes(ex) || idLower.includes(ex.replace(/\s+/g, '_')));
-                        
-                        // Asegurar que no excluya por error 'estado de aprobacion' si coincide con 'aprobacion'
-                        if (titleLower.includes('estado') && titleLower.includes('aprob')) {
-                            return true; // Conservar 'Estado de Aprobación'
-                        }
                         return !isExcluded;
                     });
                     boardMetadata.groups = board.groups || [];
                     
-                    // Parsear items y sus column_values JSON
+                    // Parsear items y filtrar líneas no diligenciadas (mostrar solo solicitudes enviadas)
                     boardItems = (board.items_page?.items || []).map(item => {
                         const parsedValues = (item.column_values || []).map(cv => {
                             let parsedObj = {};
@@ -531,6 +559,11 @@
                             group: item.group || { id: 'default', title: 'General' },
                             column_values: parsedValues
                         };
+                    }).filter(item => {
+                        // Filtrar líneas vacías o no diligenciadas
+                        const hasValidName = item.name && item.name.trim() !== '' && !item.name.toLowerCase().startsWith('nuevo elemento') && !item.name.toLowerCase().startsWith('new item');
+                        const hasDiligence = item.column_values.some(cv => cv.text && cv.text.trim() !== '' && cv.text !== '-');
+                        return hasValidName && hasDiligence;
                     });
 
                     document.getElementById('boardNameHeader').innerText = board.name || "Tablero de Monday";
@@ -566,8 +599,7 @@
                     columns: [
                         { id: "adcar", title: "Adcar", type: "text" },
                         { id: "motivo_gerencia", title: "Motivo Gerencia", type: "status", settings_str: JSON.stringify({ labels: { 1: "Vacaciones", 2: "Permiso Personal", 3: "Incapacidad Médica", 4: "Capacitación / Formación" } }) },
-                        { id: "cronograma", title: "Cronograma", type: "timeline" },
-                        { id: "estado_aprobacion", title: "Estado de Aprobación", type: "status", settings_str: JSON.stringify({ labels: { 1: "Aprobado", 2: "Pendiente", 3: "Rechazado" } }) }
+                        { id: "cronograma", title: "Cronograma", type: "timeline" }
                     ],
                     groups: [{ id: "group_1", title: "Solicitudes 2025" }]
                 };
@@ -579,8 +611,7 @@
                         column_values: [
                             { id: "adcar", text: "AD-001 - Angela Cartagena", type: "text" },
                             { id: "motivo_gerencia", text: "Vacaciones", label: "Vacaciones", type: "status" },
-                            { id: "cronograma", text: "2025-04-14 - 2025-04-20", from: "2025-04-14", to: "2025-04-20", type: "timeline" },
-                            { id: "estado_aprobacion", text: "Aprobado", label: "Aprobado", type: "status" }
+                            { id: "cronograma", text: "2025-04-14 - 2025-04-20", from: "2025-04-14", to: "2025-04-20", type: "timeline" }
                         ]
                     },
                     {
@@ -590,8 +621,7 @@
                         column_values: [
                             { id: "adcar", text: "AD-002 - Carlos Restrepo", type: "text" },
                             { id: "motivo_gerencia", text: "Permiso Personal", label: "Permiso Personal", type: "status" },
-                            { id: "cronograma", text: "2025-04-02 - 2025-04-03", from: "2025-04-02", to: "2025-04-03", type: "timeline" },
-                            { id: "estado_aprobacion", text: "Aprobado", label: "Aprobado", type: "status" }
+                            { id: "cronograma", text: "2025-04-02 - 2025-04-03", from: "2025-04-02", to: "2025-04-03", type: "timeline" }
                         ]
                     },
                     {
@@ -601,8 +631,7 @@
                         column_values: [
                             { id: "adcar", text: "AD-003 - Mariana Gómez", type: "text" },
                             { id: "motivo_gerencia", text: "Incapacidad Médica", label: "Incapacidad Médica", type: "status" },
-                            { id: "cronograma", text: "2025-03-25 - 2025-03-28", from: "2025-03-25", to: "2025-03-28", type: "timeline" },
-                            { id: "estado_aprobacion", text: "Aprobado", label: "Aprobado", type: "status" }
+                            { id: "cronograma", text: "2025-03-25 - 2025-03-28", from: "2025-03-25", to: "2025-03-28", type: "timeline" }
                         ]
                     },
                     {
@@ -612,8 +641,7 @@
                         column_values: [
                             { id: "adcar", text: "AD-004 - Felipe Morales", type: "text" },
                             { id: "motivo_gerencia", text: "Capacitación / Formación", label: "Capacitación / Formación", type: "status" },
-                            { id: "cronograma", text: "2025-04-10 - 2025-04-11", from: "2025-04-10", to: "2025-04-11", type: "timeline" },
-                            { id: "estado_aprobacion", text: "Pendiente", label: "Pendiente", type: "status" }
+                            { id: "cronograma", text: "2025-04-10 - 2025-04-11", from: "2025-04-10", to: "2025-04-11", type: "timeline" }
                         ]
                     }
                 ];
@@ -635,11 +663,11 @@
             const grid = document.getElementById('dynamicKpisGrid');
             grid.innerHTML = '';
 
-            let statusCol = boardMetadata.columns.find(c => c.type === 'status' || c.id.toLowerCase().includes('status'));
-            let counts = { Total: boardItems.length };
+            let statusCol = boardMetadata.columns.find(c => c.type === 'status' || c.id.toLowerCase().includes('status') || c.id.includes('motivo'));
+            let counts = { 'Solicitudes Enviadas': boardItems.length };
 
             boardItems.forEach(item => {
-                let statusVal = "Sin Estado";
+                let statusVal = "General";
                 if (statusCol) {
                     const valObj = item.column_values.find(v => v.id === statusCol.id);
                     if (valObj && valObj.text) statusVal = valObj.text;
@@ -650,16 +678,16 @@
             grid.innerHTML += `
                 <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
-                        <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Total Elementos</p>
-                        <h3 class="text-xl font-bold text-slate-900 mt-0.5">${counts.Total}</h3>
+                        <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Solicitudes Enviadas</p>
+                        <h3 class="text-xl font-bold text-slate-900 mt-0.5">${counts['Solicitudes Enviadas']}</h3>
                     </div>
                     <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-                        <i data-lucide="layers" class="w-5 h-5"></i>
+                        <i data-lucide="send" class="w-5 h-5"></i>
                     </div>
                 </div>
             `;
 
-            const labels = Object.keys(counts).filter(k => k !== 'Total');
+            const labels = Object.keys(counts).filter(k => k !== 'Solicitudes Enviadas');
             labels.slice(0, 3).forEach((label, idx) => {
                 const color = DEFAULT_COLORS[idx % DEFAULT_COLORS.length];
                 grid.innerHTML += `
