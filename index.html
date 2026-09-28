@@ -788,7 +788,16 @@
             const container = document.getElementById('dynamicFormFields');
             container.innerHTML = '';
 
+            // Filtrar columnas de aprobación para que solo la gerencia apruebe en Monday
+            const excludedFormTitles = ['aprobacion', 'aprobación', 'estado de aprobacion', 'estado de aprobación', 'estado aprobacion', 'estado aprobación'];
+
             boardMetadata.columns.forEach(col => {
+                const titleLower = (col.title || '').toLowerCase().trim();
+                const idLower = (col.id || '').toLowerCase().trim();
+                if (excludedFormTitles.some(ex => titleLower.includes(ex) || idLower.includes(ex.replace(/\s+/g, '_')))) {
+                    return; // No mostrar opción de estado/aprobación al crear registro
+                }
+
                 let inputHtml = '';
                 if (col.type === 'status') {
                     let labelsFromSettings = [];
@@ -809,7 +818,7 @@
                         }).filter(Boolean)
                     ])];
 
-                    const defaultFallback = ['Aprobado', 'Pendiente', 'Rechazado', 'Vacaciones', 'Permiso'];
+                    const defaultFallback = ['Vacaciones', 'Permiso Personal', 'Incapacidad Médica', 'Capacitación / Formación'];
                     const finalLabels = knownLabels.length > 0 ? knownLabels : defaultFallback;
 
                     const options = finalLabels.map(opt => `<option value="${opt}">${opt}</option>`).join('');
@@ -864,7 +873,15 @@
             const fieldsContainer = document.getElementById('dynamicEditFields');
             fieldsContainer.innerHTML = '';
 
+            const excludedFormTitles = ['aprobacion', 'aprobación', 'estado de aprobacion', 'estado de aprobación', 'estado aprobacion', 'estado aprobación'];
+
             boardMetadata.columns.forEach(col => {
+                const titleLower = (col.title || '').toLowerCase().trim();
+                const idLower = (col.id || '').toLowerCase().trim();
+                if (excludedFormTitles.some(ex => titleLower.includes(ex) || idLower.includes(ex.replace(/\s+/g, '_')))) {
+                    return; // No editar estado de aprobación desde el formulario del dashboard
+                }
+
                 const valObj = item.column_values.find(v => v.id === col.id) || {};
                 const currentText = valObj.text || '';
 
@@ -888,7 +905,7 @@
                         }).filter(Boolean)
                     ])];
 
-                    const defaultFallback = ['Aprobado', 'Pendiente', 'Rechazado', 'Vacaciones', 'Permiso'];
+                    const defaultFallback = ['Vacaciones', 'Permiso Personal', 'Incapacidad Médica', 'Capacitación / Formación'];
                     const finalLabels = knownLabels.length > 0 ? knownLabels : defaultFallback;
 
                     const options = finalLabels.map(opt => `<option value="${opt}" ${opt === currentText ? 'selected' : ''}>${opt}</option>`).join('');
